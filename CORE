@@ -1,0 +1,203 @@
+
+Switch01#sh run
+Building configuration...
+
+Current configuration : 5601 bytes
+!
+! Last configuration change at 03:44:19 UTC Mon Feb 23 2026
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname Switch01
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+!
+aaa new-model
+!
+!
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+aaa authorization network cts-list group radius
+aaa accounting dot1x default start-stop group radius
+!
+!
+!
+!
+!
+aaa server radius dynamic-author
+ client 10.10.10.120 server-key ************
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+ip dhcp excluded-address 192.168.10.1 192.168.10.20
+ip dhcp excluded-address 10.10.10.1 10.10.10.200
+ip dhcp excluded-address 10.10.10.1 10.10.10.149
+!
+!
+no ip domain-lookup
+ip cef
+no ipv6 cef
+!
+!
+cts authorization list cts-list
+cts logging verbose
+cts role-based enforcement
+cts sxp enable
+cts sxp default source-ip 10.10.10.10
+cts sxp default password ************
+cts sxp connection peer 10.10.10.120 password default mode peer speaker hold-time 0 0
+cts sxp log binding-changes
+dot1x system-auth-control
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel10
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Port-channel11
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 10 mode passive
+!
+interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 10 mode passive
+!
+interface GigabitEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 11 mode active
+!
+interface GigabitEthernet0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 11 mode active
+!
+interface GigabitEthernet1/0
+ switchport access vlan 10
+ switchport mode access
+ negotiation auto
+!
+interface GigabitEthernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+!
+interface GigabitEthernet1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ cts dot1x
+  sap mode-list null
+!
+interface GigabitEthernet1/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ cts dot1x
+  sap mode-list null
+!
+interface GigabitEthernet2/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+!
+interface GigabitEthernet2/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+!
+interface GigabitEthernet2/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ cts dot1x
+  sap mode-list no-encap
+!
+interface GigabitEthernet2/3
+ negotiation auto
+!
+interface GigabitEthernet3/0
+ negotiation auto
+!
+interface GigabitEthernet3/1
+ switchport access vlan 203
+ switchport mode access
+ negotiation auto
+!
+interface Vlan10
+ ip address 10.10.10.10 255.255.255.0
+!
+interface Vlan200
+ ip address 192.168.200.254 255.255.255.0
+ ip helper-address 10.10.10.121
+!
+interface Vlan201
+ ip address 192.168.201.254 255.255.255.0
+ ip helper-address 10.10.10.121
+!
+interface Vlan202
+ ip address 192.168.202.254 255.255.255.0
+ ip helper-address 10.10.10.121
+!
+interface Vlan203
+ ip address 192.168.203.254 255.255.255.0
+ ip helper-address 10.10.10.121
+!
+ip forward-protocol nd
+!
+ip http server
+!
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+ip radius source-interface Vlan10
+!
+!
+!
+!
+!
+radius server 10.10.10.120
+ address ipv4 10.10.10.120 auth-port 1812 acct-port 1813
+ pac key ************
+!
+!
