@@ -1,0 +1,148 @@
+Switch03#sh run
+Building configuration...
+
+Current configuration : 4348 bytes
+!
+! Last configuration change at 03:46:11 UTC Mon Feb 23 2026
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname Switch03
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+aaa new-model
+!
+!
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+aaa authorization network cts-list group radius
+aaa accounting dot1x default start-stop group radius
+!
+!
+!
+!
+!
+aaa server radius dynamic-author
+ client 10.10.10.120 server-key *********
+ client 10.10.10.122 server-key *********
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+cts authorization list cts-list
+cts sxp enable
+cts sxp default source-ip 10.10.10.13
+cts sxp default password *********
+cts sxp connection peer 10.10.10.120 password default mode peer listener hold-time 0
+dot1x system-auth-control
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel11
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ switchport mode access
+ negotiation auto
+ authentication event fail action next-method
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 10
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ negotiation auto
+!
+interface GigabitEthernet0/3
+ negotiation auto
+!
+interface GigabitEthernet1/0
+ negotiation auto
+!
+interface GigabitEthernet1/1
+ negotiation auto
+!
+interface GigabitEthernet1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 11 mode passive
+!
+interface GigabitEthernet1/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 11 mode passive
+!
+interface Vlan10
+ ip address 10.10.10.33 255.255.255.0
+!
+ip forward-protocol nd
+!
+ip http server
+!
+ip route 0.0.0.0 0.0.0.0 10.10.10.10
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+ip radius source-interface Vlan10
+!
+!
+!
+!
+!
+radius server 10.10.10.120
+ address ipv4 10.10.10.120 auth-port 1812 acct-port 1813
+ pac key *********
+!
+radius server ISE02
+ address ipv4 10.10.10.122 auth-port 1812 acct-port 1813
+ pac key *********
+!
+!
+control-plane
+!
